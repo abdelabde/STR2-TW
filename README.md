@@ -1,16 +1,16 @@
 # STR2-TW
 
-**A self-tuning ruin-and-recreate heuristic for large-scale vehicle routing with time windows**
+**A self-tuning ruin-and-recreate heuristic for real-world large-scale vehicle routing with time windows**
 
 This repository contains the code accompanying the paper:
 
-> *A Self-Tuning Ruin-and-Recreate Heuristic for Large-Scale Vehicle Routing with Time Windows.*
-> <Authors>. Submitted to *INFORMS Journal on Computing*, 2026.
+> *A Self-Tuning Ruin-and-Recreate Heuristic for Real-World Large-Scale Vehicle Routing with Time Windows.*
+> Abdelhakim Abdellaoui, Issmaïl El Hallaoui, Loubna Benabbou. Submitted to *Computers & Operations Research*, 2026.
 
 STR2-TW solves the vehicle routing problem with time windows (VRPTW) with hard
 windows, at the size of industrial operations (several thousand customers) and
 under practical time budgets (one hour or less). It builds on the
-ruin-and-recreate framework and makes its main parameters self-tuned:
+ruin-and-recreate framework and makes two of its parameters self-tuned:
 
 - **Acceptance threshold.** The simulated annealing threshold is not fixed in
   advance. It is calibrated on the instance being solved, from the median cost
@@ -22,11 +22,11 @@ ruin-and-recreate framework and makes its main parameters self-tuned:
   upper-confidence-bound bandit selects among the candidate sizes during the
   run.
 - **Hard feasibility at every moment.** Insertions are screened by a
-  constant-time time-window test based on the forward time slack of
-  Savelsbergh; removals never need to be tested. Every intermediate solution
-  is feasible, so the solver can be stopped at any time with a valid plan.
-- **Parallel islands.** `W` independent searches run in parallel and exchange
-  their best solutions periodically.
+  constant-time time-window test based on the time slack of Savelsbergh;
+  removals never need to be tested. Every intermediate solution is feasible,
+  so the solver can be stopped at any time with a valid plan.
+- **Parallel islands.** `W` searches run in parallel from different starting
+  solutions, and the best solution found is returned.
 
 ---
 
@@ -34,8 +34,8 @@ ruin-and-recreate framework and makes its main parameters self-tuned:
 
 | File | Content |
 |---|---|
-| `core_tw.py` | Array representation of a solution, Solomon-format reader, neighbor lists, initial construction, and an independent validator that re-simulates every route from the depot. |
-| `kernel_tw.py` | Compiled kernel (Numba): forward and backward schedules, constant-time insertion test, ruin and recreate operators, fallback scan, measurement mode. |
+| `core_tw.py` | Array representation of a solution, Solomon-format reader, distance matrix, neighbor lists, initial construction, and an independent validator that re-simulates every route from the depot. |
+| `kernel_tw.py` | Compiled kernel (Numba): schedules, constant-time insertion test, ruin and recreate operators, fallback scan, measurement mode. |
 | `str2_tw.py` | Island loop: threshold calibration, cycles, bandit, fleet minimization. |
 | `run_str2_tw.py` | Entry point: process management, shared matrices, objectives, result files and diagnostics. |
 | `run_pyvrp_tw.py` | Runs PyVRP on the same instances, with the same matrices and the same validator, for the comparison of the paper. |
@@ -55,9 +55,9 @@ pip install numpy numba pandas openpyxl matplotlib
 pip install pyvrp==0.11.3          # only for the comparison with PyVRP
 ```
 
-The optional set-covering recombination stage requires <commercial MIP solver
-and version>. It is disabled in all the experiments of the paper, and the
-solver runs without it.
+The results of the paper were obtained with PyVRP 0.11.3, which implements
+the hybrid genetic search. From version 0.13.0 on, PyVRP uses a different
+algorithm, so other versions give different results.
 
 ---
 
@@ -94,16 +94,28 @@ distance-only convention of the DIMACS challenge is selected with:
 NOVA_OBJ=dist NOVA_TW_DIST=trunc1 python run_str2_tw.py <spec> <budget_s> <n_islands>
 ```
 
-### Main environment variables
+### Environment variables
 
-| Variable | Effect |
-|---|---|
-| `NOVA_OBJ` | `lex` (default) or `dist`. |
-| `NOVA_TW_DIST` | Distance convention; `trunc1` truncates distances to one decimal (DIMACS). |
-| `NOVA_XLSX` | Name of the result spreadsheet (default `resultats_nova_tw.xlsx`). |
-| `NOVA_DIAGDIR` | Folder of the diagnostics files (default `diagnostics/`). |
+The defaults are the values of Table 1 of the paper.
 
-The full list is given in the header of `run_str2_tw.py`.
+| Variable | Effect | Default |
+|---|---|---|
+| `NOVA_OBJ` | objective: `lex` or `dist` | `lex` |
+| `NOVA_TW_DIST` | distance convention; `trunc1` truncates to one decimal (DIMACS) | `float` |
+| `NOVA_KNN` | number of nearest neighbors κ | 30 |
+| `NOVA_CHUNK` | iterations per block B | 20000 |
+| `NOVA_TACC` | target acceptance probability p | 0.10 |
+| `NOVA_TRATIO` | final-to-initial threshold ratio η | 0.01 |
+| `NOVA_TPROBE` | iterations per measurement phase N | 30000 |
+| `NOVA_CYCLEN` | target cycle length (s) | 100 |
+| `NOVA_UCB_GAMMA` | bandit discount γ | 0.98 |
+| `NOVA_UCB_C` | bandit exploration weight ω | 0.5 |
+| `NOVA_XLSX` | result spreadsheet | `resultats_nova_tw.xlsx` |
+| `NOVA_SOLDIR` | folder of the solution files | `solutions/` |
+| `NOVA_DIAGDIR` | folder of the diagnostics files | `diagnostics/` |
+| `NOVA_DIAG` | `0` disables the diagnostics files | `1` |
+
+The variables used by the ablation study are listed below.
 
 ### Outputs
 
@@ -127,26 +139,30 @@ python run_pyvrp_tw.py <spec> <budget_s> <n_islands>
 ```
 
 PyVRP receives the same instance files and the same distance matrix (scaled to
-integers), runs the same number of single-threaded processes, and its routes
-are re-validated and re-costed by the validator of `core_tw.py`, so that the
-two solvers are compared on exactly the same basis.
+integers by `PYVRP_SCALE`, 1000 by default), runs the same number of
+single-threaded processes, and its routes are re-validated and re-costed by
+the validator of `core_tw.py`, so that the two solvers are compared on exactly
+the same basis.
 
 On very large instances, the start of the PyVRP processes can exceed the
 memory of the machine. `PYVRP_STAGGER=<s>` starts island `i` after `i × s`
 seconds and removes this delay from its budget, so that all islands stop at
-the same time:
+the same time. This option was used for instance I8:
 
 ```bash
 PYVRP_STAGGER=8 python run_pyvrp_tw.py instances/industrial/I8.txt 3600 20
 ```
 
 The other options (`PYVRP_OBJ`, `PYVRP_FLEET_FIX`, `PYVRP_FLEET_SLACK`,
-`PYVRP_ALLOW_INFEAS`, `PYVRP_DIAG`, …) are documented in the header of
-`run_pyvrp_tw.py`.
+`PYVRP_ALLOW_INFEAS`, `PYVRP_DIAG`, `PYVRP_XLSX`, …) are documented in the
+header of `run_pyvrp_tw.py`. None of them was used for the results of the
+paper, except `PYVRP_STAGGER` on I8.
 
 ---
 
 ## Reproducing the experiments of the paper
+
+### Comparison with PyVRP (Section 8.2)
 
 ```bash
 # STR2-TW on the eight industrial instances (lexicographic, 1 h, 20 islands)
@@ -155,10 +171,32 @@ python run_str2_tw.py "instances/industrial/*.txt" 3600 20
 # PyVRP on the same instances
 python run_pyvrp_tw.py "instances/industrial/*.txt" 3600 20
 
-# tables and figures
+# figures
 python exploit_diagnostics.py diagnostics figures_paper
 python exploit_diagnostics.py diagnostics_pyvrp figures_paper
 ```
+
+### Ablation study (Section 8.4)
+
+Each configuration replaces one component by the rule of the literature, with
+a budget of 30 minutes and three islands:
+
+| Configuration | Variables |
+|---|---|
+| full configuration | none |
+| constant threshold T0 = 100 | `NOVA_T0_ABS=100` |
+| fixed fraction T0 = 1e-5 c | `NOVA_T0=1e-5 NOVA_TRECAL=0` |
+| no fallback scan | `NOVA_NOSCAN=1` |
+| fixed sizes (floors only) | `NOVA_FIXED_SIZES=1` |
+
+For example:
+
+```bash
+NOVA_NOSCAN=1 NOVA_XLSX=noscan_I1.xlsx NOVA_DIAGDIR=diagnostics/abl/noscan_I1 \
+python run_str2_tw.py instances/industrial/I1.txt 1800 3
+```
+
+### Hardware
 
 All experiments of the paper were run on one Intel Core i7-12700 (12 cores,
 20 hardware threads) with 64 GB of RAM. Each instance is solved by 20
@@ -175,16 +213,23 @@ travel time in minutes at a constant speed of 50 km/h; kilometers are
 obtained by dividing a cost by 1.2. Time windows and service durations are in
 minutes from midnight.
 
-| Instance | Customers | Description |
+| Instance | Customers | Source |
 |---|---|---|
-| I1–I5 | 2,315 to 2,919 | Montréal area, one morning of orders each |
-| I6 | 2,175 | Montréal depot, deliveries gathered over the period |
-| I7 | 4,198 | Toronto depot, deliveries gathered over the period |
-| I8 | 6,424 | London (Ontario) depot, deliveries gathered over the period |
+| I1–I5 | 2,315 to 2,919 | online grocery operator, Montréal area, the orders of one morning each; demands in baskets |
+| I6 | 2,175 | furniture and appliance retailer, Montréal depot, deliveries gathered over several months |
+| I7 | 4,198 | furniture and appliance retailer, Toronto depot, deliveries gathered over several months |
+| I8 | 6,424 | furniture and appliance retailer, London (Ontario) depot, deliveries gathered over several months |
+
+Orders larger than the capacity of a vehicle, served by dedicated vehicles,
+are excluded from the instances, as is any customer that cannot be served
+within its window while still allowing the vehicle to return to the depot
+before it closes. For I6 to I8, demands and capacities are the volumes
+recorded by the retailer; on I6 and I7, every item is recorded with a default
+volume of 25 units.
 
 <State here whether the industrial instances are included, anonymized, or
 available on request, according to the agreement with the industrial
-partner.>
+partners.>
 
 ---
 
@@ -194,10 +239,10 @@ If you use this code, please cite:
 
 ```bibtex
 @article{str2tw2026,
-  author  = {<Authors>},
-  title   = {A Self-Tuning Ruin-and-Recreate Heuristic for Large-Scale
-             Vehicle Routing with Time Windows},
-  journal = {INFORMS Journal on Computing},
+  author  = {Abdellaoui, Abdelhakim and El Hallaoui, Issma{\"\i}l and Benabbou, Loubna},
+  title   = {A Self-Tuning Ruin-and-Recreate Heuristic for Real-World
+             Large-Scale Vehicle Routing with Time Windows},
+  journal = {Computers \& Operations Research},
   year    = {2026},
   note    = {Submitted}
 }
