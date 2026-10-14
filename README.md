@@ -53,10 +53,6 @@ pip install numpy numba pandas openpyxl matplotlib
 pip install pyvrp         # only for the comparison with PyVRP
 ```
 
-The results of the paper were obtained with PyVRP 0.11.3, which implements
-the hybrid genetic search. From version 0.13.0 on, PyVRP uses a different
-algorithm, so other versions give different results.
-
 ---
 
 ## Usage
