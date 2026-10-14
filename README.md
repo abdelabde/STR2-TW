@@ -88,29 +88,6 @@ distance-only convention of the DIMACS challenge is selected with:
 NOVA_OBJ=dist NOVA_TW_DIST=trunc1 python run_str2_tw.py <spec> <budget_s> <n_islands>
 ```
 
-### Environment variables
-
-The defaults are the values of Table 1 of the paper.
-
-| Variable | Effect | Default |
-|---|---|---|
-| `NOVA_OBJ` | objective: `lex` or `dist` | `lex` |
-| `NOVA_TW_DIST` | distance convention; `trunc1` truncates to one decimal (DIMACS) | `float` |
-| `NOVA_KNN` | number of nearest neighbors κ | 30 |
-| `NOVA_CHUNK` | iterations per block B | 20000 |
-| `NOVA_TACC` | target acceptance probability p | 0.10 |
-| `NOVA_TRATIO` | final-to-initial threshold ratio η | 0.01 |
-| `NOVA_TPROBE` | iterations per measurement phase N | 30000 |
-| `NOVA_CYCLEN` | target cycle length (s) | 100 |
-| `NOVA_UCB_GAMMA` | bandit discount γ | 0.98 |
-| `NOVA_UCB_C` | bandit exploration weight ω | 0.5 |
-| `NOVA_XLSX` | result spreadsheet | `resultats_nova_tw.xlsx` |
-| `NOVA_SOLDIR` | folder of the solution files | `solutions/` |
-| `NOVA_DIAGDIR` | folder of the diagnostics files | `diagnostics/` |
-| `NOVA_DIAG` | `0` disables the diagnostics files | `1` |
-
-The variables used by the ablation study are listed below.
-
 ### Outputs
 
 - **Result spreadsheet**: vehicles, distance, validity and time for each
