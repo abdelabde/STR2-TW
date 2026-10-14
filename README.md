@@ -52,7 +52,7 @@ Tested with Python 3.11 on Linux (AlmaLinux 9).
 git clone https://github.com/<user>/<repo>.git
 cd <repo>
 pip install numpy numba pandas openpyxl matplotlib
-pip install pyvrp==0.11.3          # only for the comparison with PyVRP
+pip install pyvrp         # only for the comparison with PyVRP
 ```
 
 The results of the paper were obtained with PyVRP 0.11.3, which implements
