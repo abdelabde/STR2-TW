@@ -154,15 +154,15 @@ Each configuration replaces one component by the rule of the literature,:
 | Configuration | Variables |
 |---|---|
 | full configuration | none |
-| constant threshold T0 = 100 | `NOVA_T0_ABS=100` |
-| fixed fraction T0 = 1e-5 c | `NOVA_T0=1e-5 NOVA_TRECAL=0` |
-| no fallback scan | `NOVA_NOSCAN=1` |
-| fixed sizes (floors only) | `NOVA_FIXED_SIZES=1` |
+| constant threshold T0 = 100 | `STR2_T0_ABS=100` |
+| fixed fraction T0 = 1e-5 c | `STR2_T0=1e-5 STR2_TRECAL=0` |
+| no fallback scan | `STR2_NOSCAN=1` |
+| fixed sizes (floors only) | `STR2_FIXED_SIZES=1` |
 
 For example:
 
 ```bash
-NOVA_NOSCAN=1 NOVA_XLSX=noscan_I1.xlsx NOVA_DIAGDIR=diagnostics/abl/noscan_I1 \
+STR2_NOSCAN=1 STR2_XLSX=noscan_I1.xlsx STR2_DIAGDIR=diagnostics/abl/noscan_I1 \
 python run_str2_tw.py instances/industrial/I1.txt 1800 3
 ```
 
@@ -172,34 +172,6 @@ All experiments of the paper were run on one Intel Core i7-12700 (12 cores,
 20 hardware threads) with 64 GB of RAM. Each instance is solved by 20
 single-threaded processes, and the best plan is retained. Results depend on
 the machine, since the budget is a wall-clock time.
-
----
-
-## Data
-
-Instances use the Solomon format. Coordinates are planar, centered on the
-depot, and expressed so that the Euclidean distance between two points is the
-travel time in minutes at a constant speed of 50 km/h; kilometers are
-obtained by dividing a cost by 1.2. Time windows and service durations are in
-minutes from midnight.
-
-| Instance | Customers | Source |
-|---|---|---|
-| I1–I5 | 2,315 to 2,919 | online grocery operator, Montréal area, the orders of one morning each; demands in baskets |
-| I6 | 2,175 | furniture and appliance retailer, Montréal depot, deliveries gathered over several months |
-| I7 | 4,198 | furniture and appliance retailer, Toronto depot, deliveries gathered over several months |
-| I8 | 6,424 | furniture and appliance retailer, London (Ontario) depot, deliveries gathered over several months |
-
-Orders larger than the capacity of a vehicle, served by dedicated vehicles,
-are excluded from the instances, as is any customer that cannot be served
-within its window while still allowing the vehicle to return to the depot
-before it closes. For I6 to I8, demands and capacities are the volumes
-recorded by the retailer; on I6 and I7, every item is recorded with a default
-volume of 25 units.
-
-<State here whether the industrial instances are included, anonymized, or
-available on request, according to the agreement with the industrial
-partners.>
 
 ---
 
