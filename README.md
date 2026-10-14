@@ -149,8 +149,7 @@ python exploit_diagnostics.py diagnostics_pyvrp figures_paper
 
 ### Ablation study (Section 8.4)
 
-Each configuration replaces one component by the rule of the literature, with
-a budget of 30 minutes and three islands:
+Each configuration replaces one component by the rule of the literature,:
 
 | Configuration | Variables |
 |---|---|
