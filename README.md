@@ -46,8 +46,6 @@ ruin-and-recreate framework and makes two of its parameters self-tuned:
 
 ## Installation
 
-Tested with Python 3.11 on Linux (AlmaLinux 9).
-
 ```bash
 git clone https://github.com/<user>/<repo>.git
 cd <repo>
