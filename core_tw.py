@@ -4,8 +4,6 @@ import re
 
 import numpy as np
 
-MIN_PER_KM = 1.2          # coordinates and times: minutes at 50 km/h
-
 
 # instance
 def parse_solomon(path):
