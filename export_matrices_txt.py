@@ -1,29 +1,4 @@
-"""
-Export of the instances I_1 to I_8 without coordinates.
 
-    python export_matrices_txt.py [out_dir] [--decimals 3] [--gzip]
-
-For each instance, reads the Solomon file, computes from the coordinates
-    - the distance matrix, in kilometers,
-    - the travel-time matrix, in minutes (constant speed of 50 km/h),
-and writes one text file <out_dir>/<I_k>.txt (or .txt.gz) with:
-
-    NAME I_1
-    CUSTOMERS 2919
-    VEHICLES 143 CAPACITY 60
-    NODES                      (one line per node, 0 = depot)
-    id demand ready due service
-    ...
-    DISTANCE_KM                (n+1 lines of n+1 values)
-    ...
-    TIME_MIN                   (n+1 lines of n+1 values)
-    ...
-    EOF
-
-No coordinate is written. The coordinates of the instance files are
-expressed so that the Euclidean distance is the travel time in minutes
-at 50 km/h, that is, kilometers x 1.2.
-"""
 import argparse
 import gzip
 import os
