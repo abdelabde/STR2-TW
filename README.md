@@ -40,7 +40,7 @@ ruin-and-recreate framework and makes two of its parameters self-tuned:
 | `run_str2_tw.py` | Entry point: process management, shared matrices, objectives, result files and diagnostics. |
 | `run_pyvrp_tw.py` | Runs PyVRP on the same instances, with the same matrices and the same validator, for the comparison of the paper. |
 | `exploit_diagnostics.py` | Builds the tables and figures of the paper from the diagnostics files. |
-| `instances/` | anonymised industrial instances are attached to the release `v1.0` of this, As we could not get real time matrix we consider travel time equal to distance as it is considered in Benchmark instances of VRPTW (time is a proxy of distance)
+| `instances/` | Anonymised industrial instances are attached to the release `v1.0` of this, As we could not get real time matrix we consider travel time equal to distance as it is considered in Benchmark instances of VRPTW (time is a proxy of distance)
 
 ---
 
