@@ -40,7 +40,8 @@ ruin-and-recreate framework and makes two of its parameters self-tuned:
 | `run_str2_tw.py` | Entry point: process management, shared matrices, objectives, result files and diagnostics. |
 | `run_pyvrp_tw.py` | Runs PyVRP on the same instances, with the same matrices and the same validator, for the comparison of the paper. |
 | `exploit_diagnostics.py` | Builds the tables and figures of the paper from the diagnostics files. |
-| `instances/` | Instance files in Solomon format (see *Data* below). |
+| `instances/` | anonymised industrial instances are attached to the release `v1.0` of this, for travel time a speed of 50 Km / h is considered
+repository. |
 
 ---
 
