@@ -1,43 +1,4 @@
-"""
-STR2-TW — noyau ruin-and-recreate compile (numba njit) pour le CVRPTW.
 
-Boucle chaude en un seul noyau type, tableaux prealloues, aucune
-allocation, annulation par traces. Les fenetres de temps sont des
-contraintes dures, verifiees sans degrader la complexite des tests :
-
-  TEST DE FAISABILITE EN O(1)  (time slack, Savelsbergh 1992 —
-  la technique de HGS-TW et de SISR-TW)
-
-    tstart[c]  debut de service COURANT de c dans sa tournee
-               (propagation avant : max(e_c, depart_prec + t))
-    lat[c]     debut de service AU PLUS TARD de c tel que TOUT l'aval
-               (y compris le retour depot) reste faisable
-               (propagation arriere : min(l_c, lat_succ - t - s_c))
-
-    Inserer u entre a et b est faisable ssi
-        st_u  = max(e_u, dep_a + t[a,u])  <= l_u
-        dep_u = st_u + s_u
-        dep_u + t[u,b] <= lat[b]          (ou <= l_0 si b = depot)
-    — trois additions et deux comparaisons, quel que soit l'aval.
-
-  Les tableaux tstart/lat d'une tournee sont rafraichis en O(longueur)
-  UNIQUEMENT quand la tournee est modifiee (chaine retiree, client
-  insere, annulation). Une iteration ne touche que quelques tournees,
-  donc ce cout reste borne.
-
-Le budget de temps est gere DEHORS : Python appelle le noyau par
-paquets de `n_iters` iterations. Mode `probe=1` : descente pure +
-collecte des deltas degradants pour calibrer T0 sur l'instance.
-
-INSTRUMENTATION : `stats` est un tableau int64 rempli en
-place — stats[0] appels au balayage de repli, stats[1] echecs de
-reconstruction (iteration annulee faute de position faisable),
-stats[2] couples (client, voisin) examines au recreate granulaire,
-stats[3] positions sautees par blink. `noscan=1` desactive le
-balayage de repli (ablation) : l'echec est immediat quand les kNN
-n'offrent aucune position faisable. Les tirages aleatoires sont
-identiques a noscan=0 tant que le repli n'etait pas invoque.
-"""
 import numpy as np
 
 try:
