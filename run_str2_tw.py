@@ -1,36 +1,4 @@
-"""
-  STR2-TW — pilote : iles paralleles pour le CVRPTW Homberger
-    python run_str2_tw.py <instance.txt | dossier | motif> [budget_s] [n_procs]
 
-  Exemples :
-    python run_str2_tw.py C1_2_1.TXT 120 8
-    python run_str2_tw.py ./homberger_1000/ auto 8
-    python run_str2_tw.py "./homberger_*/R1*.TXT" 300 8
-
-Les instances sont les fichiers Solomon / Gehring & Homberger
-(VEHICLE / CUSTOMER) telecharges depuis CVRPLIB
-(https://galgos.inf.puc-rio.br/cvrplib — Set Homberger) ou SINTEF.
-
-  budget "auto" : 0.6 s par client (ex. 600 s pour n=1000).
-  W iles : W processus, chacun une graine et une construction initiale
-  differente ; la matrice D est partagee par fork (copie sur ecriture).
-  Meilleur global au sens LEXICOGRAPHIQUE (vehicules, distance) —
-  l'objectif officiel des jeux Homberger.
-
-BKS optionnel : fichier bks_tw.csv a cote du script, colonnes
-  instance,vehicles,distance   (ex. C1_2_1,20,2704.57)
-
-Sortie : solution_<instance>.txt au format SINTEF
-  Route 1 : 21 23 26 ...
-et code retour non nul si la solution finale viole une contrainte.
-
-Diagnostics : chaque ile ecrit
-  diagnostics/diagnostics_<instance>_<seed>.json
-(trajectoire du meilleur cout, mesures de seuil par cycle,
-echantillon des deltas du cycle 1, compteurs du noyau, reductions
-de flotte, etat du bandit). STR2_DIAG=0 desactive,
-STR2_DIAGDIR change le dossier.
-"""
 import glob
 import json
 import multiprocessing as mp
