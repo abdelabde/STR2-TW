@@ -47,8 +47,6 @@ ruin-and-recreate framework and makes two of its parameters self-tuned:
 ## Installation
 
 ```bash
-git clone https://github.com/<user>/<repo>.git
-cd <repo>
 pip install numpy numba pandas openpyxl matplotlib
 pip install pyvrp         # only for the comparison with PyVRP
 ```
