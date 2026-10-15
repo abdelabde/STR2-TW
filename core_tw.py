@@ -1,25 +1,4 @@
-"""
-STR2-TW — noyau Python : parseur Solomon/Homberger, representation en
-tableaux, construction initiale faisable-TW, validation dure.
 
-Representation en tableaux (comme dans HGS) :
-    nxt[c], prv[c]  successeur / predecesseur de c   (0 = depot)
-    rte[c]          index de la tournee de c
-    first[r]        premier client de la tournee r   (0 = vide)
-    load[r]         charge de la tournee r
-plus les donnees temporelles :
-    e[c], l[c]      fenetre [ready, due] — l est le DERNIER DEBUT de
-                    service autorise (convention Solomon)
-    s[c]            duree de service
-et les tableaux de temps entretenus par le noyau :
-    tstart[c]       debut de service courant
-    lat[c]          debut de service au plus tard (aval faisable)
-
-DISTANCES : euclidiennes en double precision (convention SINTEF pour
-les jeux Gehring & Homberger — les BKS publies sont a deux decimales).
-STR2_TW_DIST=trunc1 tronque a une decimale (ancienne convention
-Solomon-100) si besoin de comparer a ces tables-la.
-"""
 import os
 import re
 
